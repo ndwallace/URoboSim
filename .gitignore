@@ -46,7 +46,6 @@
 *.kdev4
 *.txt
 *.uproject
-*.uplugin
 
 # Precompiled Assets
 SourceArt/**/*.png
