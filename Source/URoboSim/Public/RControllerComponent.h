@@ -17,12 +17,15 @@ class UROBOSIM_API URControllerComponent : public UActorComponent
 
 public:
     // Sets default values for this component's properties
-    URControllerComponent();
     URControllerFactory* ControllerFactory;
     ARRobot* Owner;
     URInputController* InputController;
+
     UPROPERTY(VisibleAnywhere, Category = "Map")
         TArray<FRControllerDesciption> ControllerDescriptionList;
+
+
+    URControllerComponent();
     virtual void CreateController(){};
     virtual void CreateControllerDesciptionList(){};
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -40,10 +43,34 @@ class UROBOSIM_API URPR2ControllerComponent : public URControllerComponent
     GENERATED_BODY()
 
 public:
+
+    // List of all Wheel of the Robot
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
+    TArray<URStaticMeshComponent*> WheelComponents;
+
+    //List of all caster/links responsible for the orientation of the wheels
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
+    TArray<URStaticMeshComponent*> WheelTurnComponents;
+
+    // Angular velocity of the wheels resulting in a forward motion of the robot
+    FRotator WheelTurnSpeed;
+
+    // Angular velocity of the wheels to change the direction of the robot
+    FVector WheelSpinnSpeed;
+
+    // Parameter for claculating angular velocity of wheels
+    float DistanceWheelCaster = 5.0f;
+
+    // Parameter for claculating angular velocity of wheels ;
+    float WheelRadius = 8.0f;
+
+
     // Sets default values for this component's properties
     URPR2ControllerComponent();
     virtual void CreateController();
     virtual void CreateControllerDesciptionList();
+    virtual void FindWheelComponents();
+    virtual void FindCasterComponents();
 
 protected:
     // Called when the game starts

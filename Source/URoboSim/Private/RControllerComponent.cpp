@@ -57,8 +57,11 @@ void URPR2ControllerComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void URPR2ControllerComponent::CreateController()
 {
-    CreateControllerDesciptionList();
     URStaticMeshComponent* Link;
+
+    CreateControllerDesciptionList();
+    FindWheelComponents();
+    FindCasterComponents();
     for(auto& CD : ControllerDescriptionList)
     {
         Link = Owner->LinkComponents.FindRef(CD.TargetName);
@@ -67,6 +70,7 @@ void URPR2ControllerComponent::CreateController()
             Link->Controller = ControllerFactory->CreateController(CD.ControllerType, Link);
             if(Link->Controller)
             {
+                Link->Controller->SetControllerComponent(this);
                 Link->Controller->InitController();
                 Link->Controller->SetTargetOrientation();
             }
@@ -74,6 +78,7 @@ void URPR2ControllerComponent::CreateController()
     }
     InputController = ControllerFactory->CreateInputController("pr2", Owner);
     InputController->InitController();
+    InputController->ControllerComponent = this;
 }
 
 void URPR2ControllerComponent::CreateControllerDesciptionList()
@@ -104,6 +109,29 @@ void URPR2ControllerComponent::CreateControllerDesciptionList()
             FRControllerDesciption ControllerDescription;
             ControllerDescription.Set(Joint.Value->ChildName, ControllerType);
             ControllerDescriptionList.Add(ControllerDescription);
+        }
+    }
+}
+
+
+void URPR2ControllerComponent::FindWheelComponents()
+{
+    for(auto& Link : Owner->LinkComponents)
+    {
+        if(Link.Value->GetName().Contains("wheel_link"))
+        {
+            WheelComponents.Add(Link.Value);
+        }
+    }
+}
+
+void URPR2ControllerComponent::FindCasterComponents()
+{
+    for(auto& Link : Owner->LinkComponents)
+    {
+        if(Link.Value->GetName().Contains("caster_rotation_link"))
+        {
+            WheelTurnComponents.Add(Link.Value);
         }
     }
 }
