@@ -16,7 +16,7 @@ class UROBOSIM_API URConstraint : public UPhysicsConstraintComponent
 {
     GENERATED_BODY()
 public:
-    URConstraint(){};
+    URConstraint();
     class URMeshHandler* MeshHandler;
 
     // Configures the Unreal Engine native joint drive
@@ -26,6 +26,10 @@ public:
     // Connects joint and links
     virtual void SetupConstraint(){};
     bool bEnableMotor = false;
+    UPROPERTY()
+    FString Type;
+    UPROPERTY()
+    FString ChildName;
 };
 
 UCLASS()
@@ -33,7 +37,8 @@ class UROBOSIM_API URFixedConstraint : public URConstraint
 {
     GENERATED_BODY()
 public:
-    URFixedConstraint(){};
+    URFixedConstraint();
+
     // Initializes and configures the contraint/ joint
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
@@ -47,7 +52,7 @@ class UROBOSIM_API URFloatingConstraint : public URFixedConstraint
 {
     GENERATED_BODY()
 public:
-    URFloatingConstraint(){};
+    URFloatingConstraint();
     // Initializes and configures the contraint/ joint
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
@@ -59,7 +64,7 @@ class UROBOSIM_API URPrismaticConstraint : public URFixedConstraint
 {
     GENERATED_BODY()
 public:
-    URPrismaticConstraint(){};
+    URPrismaticConstraint();
     // Initializes and configures the contraint/ joint
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
@@ -71,7 +76,7 @@ class UROBOSIM_API URRevoluteConstraint : public URFixedConstraint
 {
     GENERATED_BODY()
 public:
-    URRevoluteConstraint(){};
+    URRevoluteConstraint();
     // Initializes and configures the contraint/ joint
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
@@ -83,7 +88,7 @@ class UROBOSIM_API URPlanarConstraint : public URFixedConstraint
 {
     GENERATED_BODY()
 public:
-    URPlanarConstraint(){};
+    URPlanarConstraint();
     // Initializes and configures the contraint/ joint
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
@@ -95,7 +100,7 @@ class UROBOSIM_API URContinuousConstraint : public URFixedConstraint
 {
     GENERATED_BODY()
 public:
-    URContinuousConstraint(){};
+    URContinuousConstraint();
     // Initializes and configures the contraint/ joint
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive

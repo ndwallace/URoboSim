@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "RController.h"
+#include "Structs.h"
 #include "RControllerComponent.generated.h"
 
 class ARRobot;
@@ -20,8 +21,10 @@ public:
     URControllerFactory* ControllerFactory;
     ARRobot* Owner;
     URInputController* InputController;
-
+    UPROPERTY(VisibleAnywhere, Category = "Map")
+        TArray<FRControllerDesciption> ControllerDescriptionList;
     virtual void CreateController(){};
+    virtual void CreateControllerDesciptionList(){};
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
@@ -40,6 +43,7 @@ public:
     // Sets default values for this component's properties
     URPR2ControllerComponent();
     virtual void CreateController();
+    virtual void CreateControllerDesciptionList();
 
 protected:
     // Called when the game starts

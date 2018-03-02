@@ -151,6 +151,7 @@ URJointController*  URControllerFactory::CreateController(FString Type, URStatic
 
 URInputController* URControllerFactory::CreateInputController(FString Type, ARRobot* Owner)
 {
+        UE_LOG(LogTemp, Warning, TEXT("create Controller"));
     URInputController* Controller = nullptr;
     if (Type.Equals("pr2", ESearchCase::IgnoreCase))
     {

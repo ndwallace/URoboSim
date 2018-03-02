@@ -39,7 +39,7 @@ public:
 
     // All the joints that connect the links together. Key is Name of joint, Value is the joint.
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
-        TMap<FString, UPhysicsConstraintComponent*> JointComponents;
+        TMap<FString, URConstraint*> JointComponents;
 
     // Initial Relative Rotation (Quaternion)
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
@@ -55,10 +55,6 @@ public:
     //List of all caster/links responsible for the orientation of the wheels
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
         TArray<URStaticMeshComponent*> WheelTurnComponents;
-
-    // List of Controller descibtions. Used by Controller component to create the controllers
-    UPROPERTY(VisibleAnywhere, Category = "Map")
-        TArray<FRControllerDesciption> ControllerDescriptionList;
 
     float Time = 0.f;
 

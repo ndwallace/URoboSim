@@ -2,6 +2,38 @@
 #include "RRobot.h"
 #include "RMeshHandler.h"
 
+URConstraint::URConstraint()
+{
+
+}
+
+URRevoluteConstraint::URRevoluteConstraint()
+{
+    Type = "revolute";
+}
+URFixedConstraint::URFixedConstraint()
+{
+    Type = "fixed";
+}
+URContinuousConstraint::URContinuousConstraint()
+{
+    Type = "continuous";
+
+}
+URFloatingConstraint::URFloatingConstraint()
+{
+    Type = "floating";
+}
+
+URPlanarConstraint::URPlanarConstraint()
+{
+    Type = "planar";
+}
+URPrismaticConstraint::URPrismaticConstraint()
+{
+    Type = "prismatic";
+}
+
 void URFixedConstraint::Init(URMeshHandler* MeshH)
 {
     MeshHandler = MeshH;
@@ -33,7 +65,7 @@ void URFixedConstraint::SetupConstraint()
 
     SetWorldLocation(MeshHandler->MeshComp->GetComponentLocation());
     SetConstrainedComponents(MeshHandler->ParentComp, NAME_None, MeshHandler->MeshComp, NAME_None);
-
+    ChildName = MeshHandler->Link->Name;
 
     FRotator ParentRotation = MeshHandler->ParentComp->GetComponentRotation();
     FRotator ChildRotation =  MeshHandler->MeshComp->GetComponentRotation();

@@ -88,34 +88,6 @@ bool URMeshHandler::CreateLink()
 
     CreateMesh();
     CreateMeshComponent();
-
-
-    FString ControllerType ="";
-    if(Link->Name.Contains("caster_rotation_link"))
-    {
-        ControllerType = TEXT("caster");
-    }
-    else if(Link->Name.Contains("wheel_link"))
-    {
-        ControllerType = TEXT("wheel");
-    }
-    else if(Link->Name.Contains("base_link"))
-    {
-        ControllerType = TEXT("orientation");
-    }
-    else if (Joint->Type.Equals("revolute", ESearchCase::IgnoreCase) ||
-            Joint->Type.Equals("continuous", ESearchCase::IgnoreCase))
-    {
-        ControllerType = Joint->Type;
-    }
-
-    if(!ControllerType.Equals(""))
-    {
-        FRControllerDesciption ControllerDescription;
-        ControllerDescription.Set(MeshComp->GetName(), ControllerType);
-        Owner->ControllerDescriptionList.Add(ControllerDescription);
-    }
-
     ConfigureMeshComponent();
     ConfigureLinkPhysics();
 
@@ -263,7 +235,6 @@ void URMeshHandlerCustom::CreateMesh()
     if (bUseVisual)
     {
         Mesh = LoadMeshFromPath(FName(*Link->Visual.Mesh));
-        UE_LOG(LogTemp, Error, TEXT("%s"),*Link->Visual.Mesh);
     }
     else
     {
@@ -299,16 +270,20 @@ void URMeshHandlerCustom::ConfigureLinkPhysics()
         MeshComp->SetMassOverrideInKg(NAME_None, Link->Inertial.Mass, true);
     }
     MeshComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
-    for (auto& Tag : GravityDisabledTags)
+    for (auto& Tag : GravityEnableTags)
     {
-        if (Link->Name.Contains(Tag))
+        if (Tag.Equals("all"))
+        {
+            MeshComp->SetEnableGravity(true);
+        }
+        else if (Link->Name.Contains(Tag))
         {
             //UE_LOG(LogTemp, Display, TEXT("Disable Gravity"));
-            MeshComp->SetEnableGravity(false);
+            MeshComp->SetEnableGravity(true);
         }
         else
         {
-            MeshComp->SetEnableGravity(true);
+            MeshComp->SetEnableGravity(false);
         }
     }
     MeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
@@ -325,8 +300,8 @@ URMeshHandler* URMeshFactory::CreateMeshHandler(ARRobot* Owner, FRNode* Node)
 
     FRLink* Link = &(Node->Link);
     bool bUseVisual = !(Link->Visual.Mesh.IsEmpty());
-    bool bUseCollision = !(Link->Collision.Mesh.IsEmpty());//false;
-
+    bool bUseCollision = !(Link->Collision.Mesh.IsEmpty());
+    // bool bUseCollision = false;
     // Collision and Visual are the same
     if (!bUseCollision && !bUseVisual)
     {
