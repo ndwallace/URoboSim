@@ -1,5 +1,6 @@
 #include "RController.h"
 #include "RRobot.h"
+#include "RControllerComponent.h"
 #include "Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
 
@@ -31,13 +32,13 @@ void URPR2InputController::SetupInputBindings(UInputComponent* IC)
 
 void URPR2InputController::TurnWheels(float AxisValue)
 {
-    Owner->WheelTurnSpeed = FRotator(0.0f,AxisValue, 0.0f ) * 80;
+    ControllerComponent->WheelTurnSpeed = FRotator(0.0f,AxisValue, 0.0f ) * 80;
 }
 
 
 void URPR2InputController::MoveForward(float AxisValue)
 {
-    Owner->WheelSpinnSpeed = FVector(0.0f, AxisValue, 0.0f) * 1000;
+    ControllerComponent->WheelSpinnSpeed = FVector(0.0f, AxisValue, 0.0f) * 1000;
 }
 
 
@@ -62,12 +63,13 @@ void URRevoluteController::ControllComand(float DeltaTime)
 
 void URWheelController::ControllComand(float DeltaTime)
 {
+
     FString Name = Target->GetName();
     FQuat Orientation = Target->GetComponentTransform().GetRotation();
 
-    if(Target->Owner->WheelSpinnSpeed.Size()==0)
+    if(ControllerComponent->WheelSpinnSpeed.Size()==0)
     {
-        float AngularVelocityWheel = Target->Owner->WheelTurnSpeed.Yaw * Target->Owner->DistanceWheelCaster /Target->Owner->WheelRadius;
+        float AngularVelocityWheel = ControllerComponent->WheelTurnSpeed.Yaw * ControllerComponent->DistanceWheelCaster /  ControllerComponent->WheelRadius;
         FQuat OrientationCaster = Caster->GetComponentTransform().GetRotation();
         FVector WTarget;
         if (Name.Contains("r_wheel"))
@@ -82,7 +84,7 @@ void URWheelController::ControllComand(float DeltaTime)
     }
     else
     {
-        Target->SetPhysicsAngularVelocityInDegrees(Orientation.RotateVector(Target->Owner->WheelSpinnSpeed),false);
+        Target->SetPhysicsAngularVelocityInDegrees(Orientation.RotateVector(ControllerComponent->WheelSpinnSpeed),false);
     }
 }
 
@@ -99,7 +101,7 @@ void URCasterController::ControllComand(float DeltaTime)
 void URWheelController::InitController()
 {
     Super::InitController();
-    for(auto& caster : Target->Owner->WheelTurnComponents)
+    for(auto& caster : ControllerComponent->WheelTurnComponents)
     {
         if(caster->GetName().Contains(GetName().Left(9)))
         {
@@ -111,8 +113,8 @@ void URWheelController::InitController()
 
 void URCasterOrientationController::ControllComand(float DeltaTime)
 {
-    FRotator AngularRotation(Target->Owner->WheelTurnSpeed * DeltaTime);
-    for (auto& Caster : Target->Owner->WheelTurnComponents)
+    FRotator AngularRotation(  ControllerComponent->WheelTurnSpeed * DeltaTime);
+    for (auto& Caster : ControllerComponent->WheelTurnComponents)
     {
         Caster->Controller->TargetOrientation = Caster->Controller->TargetOrientation* AngularRotation.Quaternion();
     }
@@ -151,6 +153,7 @@ URJointController*  URControllerFactory::CreateController(FString Type, URStatic
 
 URInputController* URControllerFactory::CreateInputController(FString Type, ARRobot* Owner)
 {
+    UE_LOG(LogTemp, Warning, TEXT("create Controller"));
     URInputController* Controller = nullptr;
     if (Type.Equals("pr2", ESearchCase::IgnoreCase))
     {

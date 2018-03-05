@@ -33,6 +33,7 @@ void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 // Start of PR2 Implementation
 
 URPR2ControllerComponent::URPR2ControllerComponent()
+    :URControllerComponent()
 {
     // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 
@@ -57,16 +58,81 @@ void URPR2ControllerComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 void URPR2ControllerComponent::CreateController()
 {
     URStaticMeshComponent* Link;
-    for(auto& CD : Owner->ControllerDescriptionList)
+
+    CreateControllerDesciptionList();
+    FindWheelComponents();
+    FindCasterComponents();
+    for(auto& CD : ControllerDescriptionList)
     {
         Link = Owner->LinkComponents.FindRef(CD.TargetName);
-        Link->Controller = ControllerFactory->CreateController(CD.ControllerType, Link);
-        Link->Controller->InitController();
-        Link->Controller->SetTargetOrientation();
+        if (Link)
+        {
+            Link->Controller = ControllerFactory->CreateController(CD.ControllerType, Link);
+            if(Link->Controller)
+            {
+                Link->Controller->SetControllerComponent(this);
+                Link->Controller->InitController();
+                Link->Controller->SetTargetOrientation();
+            }
+        }
     }
     InputController = ControllerFactory->CreateInputController("pr2", Owner);
     InputController->InitController();
+    InputController->ControllerComponent = this;
+}
+
+void URPR2ControllerComponent::CreateControllerDesciptionList()
+{
+    for(auto& Joint : Owner->JointComponents)
+    {
+        FString ControllerType ="";
+        if(Joint.Value->ChildName.Contains("caster_rotation_link"))
+        {
+            ControllerType = TEXT("caster");
+        }
+        else if(Joint.Value->ChildName.Contains("wheel_link"))
+        {
+            ControllerType = TEXT("wheel");
+        }
+        else if(Joint.Value->ChildName.Contains("base_link"))
+        {
+            ControllerType = TEXT("orientation");
+        }
+        else if (Joint.Value->Type.Equals("revolute", ESearchCase::IgnoreCase) ||
+                Joint.Value->Type.Equals("continuous", ESearchCase::IgnoreCase))
+        {
+            ControllerType = Joint.Value->Type;
+        }
+
+        if(!ControllerType.Equals(""))
+        {
+            FRControllerDesciption ControllerDescription;
+            ControllerDescription.Set(Joint.Value->ChildName, ControllerType);
+            ControllerDescriptionList.Add(ControllerDescription);
+        }
+    }
 }
 
 
+void URPR2ControllerComponent::FindWheelComponents()
+{
+    for(auto& Link : Owner->LinkComponents)
+    {
+        if(Link.Value->GetName().Contains("wheel_link"))
+        {
+            WheelComponents.Add(Link.Value);
+        }
+    }
+}
+
+void URPR2ControllerComponent::FindCasterComponents()
+{
+    for(auto& Link : Owner->LinkComponents)
+    {
+        if(Link.Value->GetName().Contains("caster_rotation_link"))
+        {
+            WheelTurnComponents.Add(Link.Value);
+        }
+    }
+}
 

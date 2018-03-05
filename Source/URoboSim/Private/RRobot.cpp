@@ -141,28 +141,22 @@ bool ARRobot::CreateActorsFromNode(FRNode* Node)
     {
         if (MeshHandler->CreateLink())
         {
-
-
-
-
             if (MeshHandler->bIsNotRoot)
             {
                 URConstraint* Constraint = CreateConstraint(MeshHandler);
                 //	  URConstraint* Constraint = ConstraintFactory.MakeConstraint(ParentComp, Joint, Link);
                 Constraint->InitDrive();
                 Constraint->SetupConstraint();
-
-
                 MeshHandler->AddConnectedJoint();
 
-                if(MeshHandler->Link->Name.Contains("wheel_link"))
-                {
-                    WheelComponents.Add(MeshHandler->MeshComp);
-                }
-                if(MeshHandler->Link->Name.Contains("caster_rotation_link"))
-                {
-                    WheelTurnComponents.Add(MeshHandler->MeshComp);
-                }
+            //     if(MeshHandler->Link->Name.Contains("wheel_link"))
+            //     {
+            //         WheelComponents.Add(MeshHandler->MeshComp);
+            //     }
+            //     if(MeshHandler->Link->Name.Contains("caster_rotation_link"))
+            //     {
+            //         WheelTurnComponents.Add(MeshHandler->MeshComp);
+            //     }
             }
 
             LinkComponents.Add(MeshHandler->Link->Name, MeshHandler->MeshComp);

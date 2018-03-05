@@ -9,8 +9,10 @@
 
 //TODO bug if durned by 180degree
 
-
+class URControllerComponent;
+class URPR2ControllerComponent;
 class ARRobot;
+
 //implements the controller functions for the robot.
 UCLASS()
     class UROBOSIM_API URController : public UObject
@@ -19,11 +21,13 @@ UCLASS()
 public:
     URController(){};
     ~URController(){};
-
     virtual void InitController();
 
+    UPROPERTY()
     ARRobot* Owner;
 
+    UPROPERTY()
+    URPR2ControllerComponent* ControllerComponent;
 };
 
 // Handle the key input from the unreal editor and passes it to the Joint controller
@@ -51,9 +55,6 @@ public:
     URJointController(){};
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-        URStaticMeshComponent* Caster;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
         URStaticMeshComponent* Target;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -61,7 +62,28 @@ public:
 
     virtual void ControllComand(float DeltaTime){};
     virtual void SetTargetOrientation();
+    virtual void SetCaster(URStaticMeshComponent* Caster){};
+    virtual void SetControllerComponent(URControllerComponent* ControllerComponent){};
+    virtual void SetControllerComponent(URPR2ControllerComponent* ControllerComponent){};
 };
+
+// Controlls implements the joint motor behaivior for PR2
+UCLASS()
+    class UROBOSIM_API  URPR2JointController : public URJointController
+{
+    GENERATED_BODY()
+public:
+    URPR2JointController(){};
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+        URStaticMeshComponent* Caster;
+
+    virtual void SetControllerComponent(URPR2ControllerComponent* ControllerComp)
+    {
+        ControllerComponent = ControllerComp;
+    };
+};
+
 
 UCLASS()
     class UROBOSIM_API URPR2InputController : public URInputController
@@ -80,7 +102,7 @@ public:
 };
 
 UCLASS()
-    class UROBOSIM_API URWheelController : public URJointController
+    class UROBOSIM_API URWheelController : public URPR2JointController
 {
     GENERATED_BODY()
 public:
@@ -91,7 +113,7 @@ public:
 };
 
 UCLASS()
-    class UROBOSIM_API URRevoluteController : public URJointController
+    class UROBOSIM_API URRevoluteController : public URPR2JointController
 {
     GENERATED_BODY()
 public:
@@ -102,7 +124,7 @@ public:
 };
 
 UCLASS()
-    class UROBOSIM_API URCasterController : public URJointController
+    class UROBOSIM_API URCasterController : public URPR2JointController
 {
     GENERATED_BODY()
 public:
@@ -113,7 +135,7 @@ public:
 };
 
 UCLASS()
-    class UROBOSIM_API URCasterOrientationController : public URJointController
+    class UROBOSIM_API URCasterOrientationController : public URPR2JointController
 {
     GENERATED_BODY()
 public:

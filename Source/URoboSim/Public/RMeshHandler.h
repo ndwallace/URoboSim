@@ -51,7 +51,7 @@ public:
     bool bEnableShapeCollisions = false;
     TArray<FString> collisionFilterArr = { "torso","wheel_link", "shoulder", "arm", "finger_link" };
     //TArray<FString> GravityDisabledTags = { "gripper","wrist", "arm", "elbow" };
-    TArray<FString> GravityDisabledTags = { "base"};
+    TArray<FString> GravityEnableTags = { "all"};
     URMeshHandler();
     ~URMeshHandler()
     {
@@ -121,6 +121,14 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URMeshHandlerFoundation : public URMeshHandler
+{
+    GENERATED_BODY()
+public:
+    URMeshHandlerFoundation(){};
+    void CreateMesh();
+};
+UCLASS()
 class UROBOSIM_API URMeshHandlerCustom: public URMeshHandler
 {
     GENERATED_BODY()
@@ -129,7 +137,6 @@ public:
     void CreateMesh();
     void CreateMeshComponent();
     void ConfigureLinkPhysics();
-
 };
 
 

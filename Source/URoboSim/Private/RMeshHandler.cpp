@@ -88,34 +88,6 @@ bool URMeshHandler::CreateLink()
 
     CreateMesh();
     CreateMeshComponent();
-
-
-    FString ControllerType ="";
-    if(Link->Name.Contains("caster_rotation_link"))
-    {
-        ControllerType = TEXT("caster");
-    }
-    else if(Link->Name.Contains("wheel_link"))
-    {
-        ControllerType = TEXT("wheel");
-    }
-    else if(Link->Name.Contains("base_link"))
-    {
-        ControllerType = TEXT("orientation");
-    }
-    else if (Joint->Type.Equals("revolute", ESearchCase::IgnoreCase) ||
-            Joint->Type.Equals("continuous", ESearchCase::IgnoreCase))
-    {
-        ControllerType = Joint->Type;
-    }
-
-    if(!ControllerType.Equals(""))
-    {
-        FRControllerDesciption ControllerDescription;
-        ControllerDescription.Set(MeshComp->GetName(), ControllerType);
-        Owner->ControllerDescriptionList.Add(ControllerDescription);
-    }
-
     ConfigureMeshComponent();
     ConfigureLinkPhysics();
 
@@ -144,6 +116,7 @@ void URMeshHandler::CreateMeshComponent()
 
 void URMeshHandler::ConfigureMeshComponent()
 {
+
     MeshComp->SetStaticMesh(Mesh);
 
     MeshComp->SetSimulatePhysics(true);
@@ -175,15 +148,16 @@ void URMeshHandler::ConfigureLinkPhysics()
 
 
     MeshComp->SetSimulatePhysics(true);
-    MeshComp->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
-    MeshComp->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-    if (!bEnableShapeCollisions)
-    {
-        MeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-    }
-
-    MeshComp->SetRelativeScale3D(FVector(1, 1, 1));
     MeshComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+    MeshComp->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+    // if (!bEnableShapeCollisions)
+    // {
+    //     MeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    // }
+
+    MeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    MeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+    MeshComp->SetRelativeScale3D(FVector(1, 1, 1));
     MeshComp->SetWorldLocation(ParentComp->GetComponentLocation());
     MeshComp->SetWorldRotation(ParentComp->GetComponentRotation());
     MeshComp->AddLocalOffset(LocationVisual);
@@ -237,6 +211,11 @@ FRConnectedJoint URMeshHandler::CreateConnectedJoint(bool IsParent)
     return TempJoint;
 }
 
+void URMeshHandlerFoundation::CreateMesh()
+{
+    Mesh = CubeMesh;
+}
+
 void URMeshHandlerBox::CreateMesh()
 {
     Mesh = CubeMesh;
@@ -255,13 +234,18 @@ void URMeshHandlerCylinder::CreateMesh()
 void URMeshHandlerCustom::CreateMesh()
 {
     if (bUseVisual)
+    {
         Mesh = LoadMeshFromPath(FName(*Link->Visual.Mesh));
+    }
     else
+    {
         Mesh = LoadMeshFromPath(FName(*Link->Collision.Mesh));
+    }
 }
 
 void URMeshHandlerCustom::CreateMeshComponent()
 {
+
     MeshComp = NewObject<URStaticMeshComponent>(Owner->Root, FName(Link->Name.GetCharArray().GetData()));
     MeshComp->Owner = Owner;
     if (bWriteParentTFTag)
@@ -276,7 +260,6 @@ void URMeshHandlerCustom::CreateMeshComponent()
         FString TFTag = FString::Printf(TEXT("TF;ChildFrameId,%s;"),
                 *Link->Name);
         MeshComp->ComponentTags.Add(FName(*TFTag));
-
     }
 
 }
@@ -288,9 +271,13 @@ void URMeshHandlerCustom::ConfigureLinkPhysics()
         MeshComp->SetMassOverrideInKg(NAME_None, Link->Inertial.Mass, true);
     }
     MeshComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
-    for (auto& Tag : GravityDisabledTags)
+    for (auto& Tag : GravityEnableTags)
     {
-        if (Link->Name.Contains(Tag))
+        if (Tag.Equals("all"))
+        {
+            MeshComp->SetEnableGravity(true);
+        }
+        else if (Link->Name.Contains(Tag))
         {
             //UE_LOG(LogTemp, Display, TEXT("Disable Gravity"));
             MeshComp->SetEnableGravity(true);
@@ -314,12 +301,21 @@ URMeshHandler* URMeshFactory::CreateMeshHandler(ARRobot* Owner, FRNode* Node)
 
     FRLink* Link = &(Node->Link);
     bool bUseVisual = !(Link->Visual.Mesh.IsEmpty());
-    bool bUseCollision = false;
-
+    bool bUseCollision = !(Link->Collision.Mesh.IsEmpty());
+    // bool bUseCollision = false;
     // Collision and Visual are the same
     if (!bUseCollision && !bUseVisual)
     {
-
+        if ( Link->Name.Equals("world"))
+        {
+            MeshHandler = NewObject<URMeshHandlerFoundation>(Owner);
+            MeshHandler->Node = Node;
+            MeshHandler->Owner = Owner;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Mesh created for %s"), *Link->Name);
+        }
     }
     else
     {

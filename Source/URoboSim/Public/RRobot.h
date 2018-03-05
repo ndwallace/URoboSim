@@ -39,7 +39,7 @@ public:
 
     // All the joints that connect the links together. Key is Name of joint, Value is the joint.
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
-        TMap<FString, UPhysicsConstraintComponent*> JointComponents;
+        TMap<FString, URConstraint*> JointComponents;
 
     // Initial Relative Rotation (Quaternion)
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
@@ -48,33 +48,7 @@ public:
     // Original relative locations of links that are constrained with prismatic type
     TMap<FString, FVector> OriginLocations;
 
-    // List of all Wheel of the Robot
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
-        TArray<URStaticMeshComponent*> WheelComponents;
-
-    //List of all caster/links responsible for the orientation of the wheels
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
-        TArray<URStaticMeshComponent*> WheelTurnComponents;
-
-    // List of Controller descibtions. Used by Controller component to create the controllers
-    UPROPERTY(VisibleAnywhere, Category = "Map")
-        TArray<FRControllerDesciption> ControllerDescriptionList;
-
     float Time = 0.f;
-
-    // Angular velocity of the wheels resulting in a forward motion of the robot
-    // TODO move to the controller component
-    FRotator WheelTurnSpeed;
-    // Angular velocity of the wheels to change the direction of the robot
-    // TODO move to the controller component
-    FVector WheelSpinnSpeed;
-
-    // Parameter for claculating angular velocity of wheels
-    // TODO move to the controller component
-    float DistanceWheelCaster = 5.0f;
-    // Parameter for claculating angular velocity of wheels ;
-    // TODO move to the controller component
-    float WheelRadius = 8.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Substepping Parameters")
         bool bSubstepEnabled = true;
