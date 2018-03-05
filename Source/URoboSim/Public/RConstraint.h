@@ -8,7 +8,6 @@
 #include "Runtime/Engine/Classes/Components/SceneComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/NoExportTypes.h"
 #include "Structs.h"
-#include "RArticulation.h"
 #include "RConstraint.generated.h"
 
 UCLASS()
