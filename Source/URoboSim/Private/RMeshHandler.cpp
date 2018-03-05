@@ -88,6 +88,7 @@ bool URMeshHandler::CreateLink()
 
     CreateMesh();
     CreateMeshComponent();
+    MeshComp->SetupAttachment(ParentComp);
     ConfigureMeshComponent();
     ConfigureLinkPhysics();
 
@@ -96,7 +97,8 @@ bool URMeshHandler::CreateLink()
 
 void URMeshHandler::CreateMeshComponent()
 {
-    MeshComp = NewObject<URStaticMeshComponent>(Owner->Root, FName((Link->Name).GetCharArray().GetData()));
+    MeshComp = NewObject<URStaticMeshComponent>(ParentComp, FName((Link->Name).GetCharArray().GetData()));
+    // MeshComp = NewObject<URStaticMeshComponent>(Owner->Root, FName((Link->Name).GetCharArray().GetData()));
     MeshComp->Owner = Owner;
     if (bWriteParentTFTag)
     {
