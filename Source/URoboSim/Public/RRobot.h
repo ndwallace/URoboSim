@@ -17,7 +17,6 @@
 
 
 // Robot that is created from joint and link information. Obtained through urdf.
-// TODO add compatibility with virtual links/ robots other than PR2
 // TODO add documentation to cpp
 UCLASS(Blueprintable)
 class UROBOSIM_API ARRobot : public AActor, public IURoboSimEd
