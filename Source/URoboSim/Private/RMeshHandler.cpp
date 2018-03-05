@@ -148,15 +148,16 @@ void URMeshHandler::ConfigureLinkPhysics()
 
 
     MeshComp->SetSimulatePhysics(true);
-    MeshComp->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
-    MeshComp->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-    if (!bEnableShapeCollisions)
-    {
-        MeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-    }
-
-    MeshComp->SetRelativeScale3D(FVector(1, 1, 1));
     MeshComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+    MeshComp->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+    // if (!bEnableShapeCollisions)
+    // {
+    //     MeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    // }
+
+    MeshComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    MeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+    MeshComp->SetRelativeScale3D(FVector(1, 1, 1));
     MeshComp->SetWorldLocation(ParentComp->GetComponentLocation());
     MeshComp->SetWorldRotation(ParentComp->GetComponentRotation());
     MeshComp->AddLocalOffset(LocationVisual);

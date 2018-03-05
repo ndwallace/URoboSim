@@ -48,14 +48,6 @@ public:
     // Original relative locations of links that are constrained with prismatic type
     TMap<FString, FVector> OriginLocations;
 
-    // List of all Wheel of the Robot
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
-        TArray<URStaticMeshComponent*> WheelComponents;
-
-    //List of all caster/links responsible for the orientation of the wheels
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Map")
-        TArray<URStaticMeshComponent*> WheelTurnComponents;
-
     float Time = 0.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Substepping Parameters")

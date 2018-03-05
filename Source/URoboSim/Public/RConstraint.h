@@ -45,6 +45,7 @@ public:
     void InitDrive(){};
     // Connects joint and links
     void SetupConstraint();
+    float CreateContraintLimit();
 };
 
 UCLASS()

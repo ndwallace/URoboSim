@@ -51,7 +51,7 @@ public:
     bool bEnableShapeCollisions = false;
     TArray<FString> collisionFilterArr = { "torso","wheel_link", "shoulder", "arm", "finger_link" };
     //TArray<FString> GravityDisabledTags = { "gripper","wrist", "arm", "elbow" };
-    TArray<FString> GravityEnableTags = { "base"};
+    TArray<FString> GravityEnableTags = { "all"};
     URMeshHandler();
     ~URMeshHandler()
     {

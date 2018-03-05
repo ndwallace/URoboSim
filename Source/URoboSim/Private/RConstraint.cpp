@@ -49,6 +49,16 @@ void URFixedConstraint::Init(URMeshHandler* MeshH)
     ConstraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = false;
 }
 
+float URFixedConstraint::CreateContraintLimit()
+{
+    float SimpleLimit  = (FMath::Abs(MeshHandler->Joint->LowerLimit) + FMath::Abs(MeshHandler->Joint->UpperLimit))/2.0f;
+    if(SimpleLimit>180.)
+    {
+        SimpleLimit = 180.;
+    }
+    return SimpleLimit;
+}
+
 void URFixedConstraint::SetupConstraint()
 {
     SetDisableCollision(true);
@@ -92,8 +102,7 @@ void URPrismaticConstraint::Init(URMeshHandler* MeshH)
     //Currently simplified limit (lower + upper as a value).
     //lower, upper A(radians for revolute joints, meters for prismatic joints)
 
-    // TODO: Make Helpfunction Create Simple limit
-    float SimpleLimit  = FMath::Abs(MeshHandler->Joint->LowerLimit) + FMath::Abs(MeshHandler->Joint->UpperLimit);
+    float SimpleLimit  = CreateContraintLimit();
     ELinearConstraintMotion LinearConstraintMotion = ELinearConstraintMotion::LCM_Limited;
 
     if (MeshHandler->Joint->Axis.X == 1)
@@ -132,8 +141,7 @@ void URRevoluteConstraint::Init(URMeshHandler* MeshH)
     //Currently simplified limit (lower + upper as a value).
     //lower, upper A(radians for revolute joints, meters for prismatic joints)
 
-    // TODO: Make Helpfunction Create Simple limit
-    float SimpleLimit  = (FMath::Abs(MeshHandler->Joint->LowerLimit) + FMath::Abs(MeshHandler->Joint->UpperLimit))/2.0f;
+    float SimpleLimit  = CreateContraintLimit();
     EAngularConstraintMotion AngularConstraintMotion = EAngularConstraintMotion::ACM_Limited;
 
     if (MeshHandler->Joint->Axis.X == 1)
