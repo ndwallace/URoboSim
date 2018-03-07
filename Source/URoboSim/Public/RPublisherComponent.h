@@ -6,28 +6,31 @@
 #include "Components/ActorComponent.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
-#include "RJointStatePublisher.generated.h"
+#include "RPublisher.h"
+#include "RPublisherComponent.generated.h"
 
-class  ARRobot;
+class ARRobot;
+//TODO add create custom message in namespace
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UROBOSIM_API URJointStatePublisher : public UActorComponent
+class UROBOSIM_API URPublisherComponent : public UActorComponent
 {
     GENERATED_BODY()
 
 public:
     // Sets default values for this component's properties
-    URJointStatePublisher();
+    URPublisherComponent();
 
-    // Called every frame
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+    virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+
+    virtual void CreateAllPublishers();
+
     UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
         FString RobotName;
 
     UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-        FString RobotJointStateTopic;
-
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-        FString RobotEffortTopic;
+        TMap<FString,bool> RosTopics;
 
     UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
         FString WebsocketIPAddr;
@@ -44,16 +47,16 @@ public:
     // ROS Handler
     TSharedPtr<FROSBridgeHandler> Handler;
 
-    // ROS Publisher
-    TSharedPtr<FROSBridgePublisher> RobotJointStatePublisher;
+    UPROPERTY(EditAnywhere, Category = "Publisher List")
+        bool bEnableJointStatePublisher;
 
-    // ROS Subscriber
-    TSharedPtr<FRobotForceSubscriberCallback> RobotForceSubscriber;
+    UPROPERTY()
+        URPublisherFactory* PublisherFactory;
+
+    UPROPERTY()
+        TArray<URPublisher* >PublisherList;
 
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
-
-
-
 };

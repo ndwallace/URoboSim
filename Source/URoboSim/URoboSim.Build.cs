@@ -29,7 +29,7 @@ public class URoboSim : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-                    		"Core", "CoreUObject", "Slate", "SlateCore", "Engine",  "HeadMountedDisplay", "XmlParser", "UnrealEd", "InputCore", "PhysX", "APEX", "URoboSimEd"
+                    		"Core", "CoreUObject", "Slate", "SlateCore", "Engine",  "HeadMountedDisplay", "XmlParser", "UnrealEd", "InputCore", "PhysX", "APEX", "URoboSimEd", "UROSBridge", "Json", "JsonUtilities"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
