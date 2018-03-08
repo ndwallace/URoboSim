@@ -43,7 +43,7 @@ void URJointStatePublisher::Publish()
     TArray<FString> ListJointName;
     TArray<double> ListJointPosition, ListJointVelocity;
 
-    for (auto &JointElement : PublisherComponent->Robot->JointComponents)
+    for (auto &JointElement : PublisherComponent->Owner->JointComponents)
     {
         FString JointName = JointElement.Value->GetName();
         float JointPosition = JointElement.Value->GetJointAngle();
@@ -83,16 +83,16 @@ bool URStringPublisher::Init(FString RosTopic)
 
 void URStringPublisher::Publish()
 {
-    // TSharedPtr<std_msgs::String> UnrealString = MakeShareable(
-    //         new std_msgs::String());
-    // UnrealString->Append(TEXT("Hello World"));
-    //
-    // // Send msg to ROS
-    // PublisherComponent->Handler->PublishMsg(Topic, UnrealString);
-    // UE_LOG(LogTemp, Log, TEXT("Sending string msg to ROS: %s"), *UnrealString->ToString());
-    //
-    // // Process messages
-    // PublisherComponent->Handler->Process();
+    TSharedPtr<std_msgs::String> UnrealString = MakeShareable(
+            new std_msgs::String());
+    UnrealString->SetData("Hello World");
+
+    // Send msg to ROS
+    PublisherComponent->Handler->PublishMsg(Topic, UnrealString);
+    UE_LOG(LogTemp, Log, TEXT("Sending string msg to ROS: %s"), *UnrealString->ToString());
+
+    // Process messages
+    PublisherComponent->Handler->Process();
 }
 
 URPublisher* URPublisherFactory::CreatePublisher(URPublisherSubscriberComponent* Owner, FString Topic)
@@ -102,7 +102,7 @@ URPublisher* URPublisherFactory::CreatePublisher(URPublisherSubscriberComponent*
     {
         Publisher = NewObject<URJointStatePublisher>(Owner, "JointStatePublisher");
     }
-    else if(Topic.Equals("String"))
+    else if(Topic.Equals("unreal_to_ros_string"))
     {
         Publisher = NewObject<URStringPublisher>(Owner, "StringPublisher");
     }
