@@ -1,18 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RPublisherComponent.h"
+#include "RPublisherSubscriberComponent.h"
 #include "RRobot.h"
 
 // Sets default values for this component's properties
-URPublisherComponent::URPublisherComponent()
+URPublisherSubscriberComponent::URPublisherSubscriberComponent()
 {
     // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
     PrimaryComponentTick.bCanEverTick = true;
-    bEnableJointStatePublisher = true;
 
     WebsocketIPAddr = TEXT("127.0.0.1");
-    WebsocketPort = 9001;
+    WebsocketPort = 9090;
     RobotName = TEXT("pr2_base");
     TickCount = 0;
     RosTopics.Add("JointState",false);
@@ -22,7 +21,7 @@ URPublisherComponent::URPublisherComponent()
 
 
 // Called when the game starts
-void URPublisherComponent::BeginPlay()
+void URPublisherSubscriberComponent::BeginPlay()
 {
     Super::BeginPlay();
     Robot = Cast<ARRobot>(GetOwner());
@@ -31,7 +30,7 @@ void URPublisherComponent::BeginPlay()
     CreateAllPublishers();
 }
 
-void URPublisherComponent::CreateAllPublishers()
+void URPublisherSubscriberComponent::CreateAllPublishers()
 {
     for(auto& Topic : RosTopics)
     {
@@ -48,13 +47,17 @@ void URPublisherComponent::CreateAllPublishers()
 }
 
 // Called every frame
-void URPublisherComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void URPublisherSubscriberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     ++TickCount;
+    for(auto& Publisher : PublisherList)
+    {
+        Publisher->Publish();
+    }
 }
 
-void URPublisherComponent::EndPlay(const EEndPlayReason::Type Reason)
+void URPublisherSubscriberComponent::EndPlay(const EEndPlayReason::Type Reason)
 {
     //Disconnect the handler before parent ends
 

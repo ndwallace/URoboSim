@@ -9,14 +9,14 @@
 #include "RPublisher.generated.h"
 
 class  ARRobot;
-class URPublisherComponent;
+class URPublisherSubscriberComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URPublisher : public UObject
 {
     GENERATED_BODY()
 public:
-    URPublisherComponent* PublisherComponent;
+    URPublisherSubscriberComponent* PublisherComponent;
     FString Topic;
 
 
@@ -77,5 +77,5 @@ class UROBOSIM_API URPublisherFactory : public UObject
 public:
     // Sets default values for this actor's properties
     URPublisherFactory(){};
-    URPublisher* CreatePublisher(URPublisherComponent* Owner, FString Topic);
+    URPublisher* CreatePublisher(URPublisherSubscriberComponent* Owner, FString Topic);
 };

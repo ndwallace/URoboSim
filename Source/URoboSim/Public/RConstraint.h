@@ -10,25 +10,39 @@
 #include "Structs.h"
 #include "RConstraint.generated.h"
 
+class ARRobot;
+class URMeshHandler;
+
 UCLASS()
 class UROBOSIM_API URConstraint : public UPhysicsConstraintComponent
 {
     GENERATED_BODY()
 public:
     URConstraint();
-    class URMeshHandler* MeshHandler;
+    UPROPERTY()
+    URMeshHandler* MeshHandler;
+
+    virtual void BeginPlay() override;
 
     // Configures the Unreal Engine native joint drive
     virtual void InitDrive(){};
     // Initializes and configures the contraint/ joint
-    virtual void Init(URMeshHandler* MeshH){};
+    virtual void Init(URMeshHandler* MeshH);
     // Connects joint and links
     virtual void SetupConstraint(){};
     bool bEnableMotor = false;
+
+    virtual float GetJointAngle();
+    virtual float GetJointVelocity();
+
     UPROPERTY()
     FString Type;
+
     UPROPERTY()
     FString ChildName;
+
+    UPROPERTY()
+    ARRobot* Owner;
 };
 
 UCLASS()

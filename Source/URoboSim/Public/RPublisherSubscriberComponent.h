@@ -7,18 +7,18 @@
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
 #include "RPublisher.h"
-#include "RPublisherComponent.generated.h"
+#include "RPublisherSubscriberComponent.generated.h"
 
 class ARRobot;
 //TODO add create custom message in namespace
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UROBOSIM_API URPublisherComponent : public UActorComponent
+class UROBOSIM_API URPublisherSubscriberComponent : public UActorComponent
 {
     GENERATED_BODY()
 
 public:
     // Sets default values for this component's properties
-    URPublisherComponent();
+    URPublisherSubscriberComponent();
 
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -46,9 +46,6 @@ public:
 
     // ROS Handler
     TSharedPtr<FROSBridgeHandler> Handler;
-
-    UPROPERTY(EditAnywhere, Category = "Publisher List")
-        bool bEnableJointStatePublisher;
 
     UPROPERTY()
         URPublisherFactory* PublisherFactory;

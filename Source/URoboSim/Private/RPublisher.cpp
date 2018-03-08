@@ -5,7 +5,7 @@
 #include "RRobot.h"
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/String.h"
-#include "RPublisherComponent.h"
+#include "RPublisherSubscriberComponent.h"
 
 URPublisher::URPublisher()
 {
@@ -14,7 +14,7 @@ URPublisher::URPublisher()
 bool URPublisher::Init(FString RosTopic)
 {
     Topic = RosTopic;
-    PublisherComponent = Cast<URPublisherComponent>(GetOuter());
+    PublisherComponent = Cast<URPublisherSubscriberComponent>(GetOuter());
     return CheckPointer(PublisherComponent);
 }
 
@@ -46,8 +46,8 @@ void URJointStatePublisher::Publish()
     for (auto &JointElement : PublisherComponent->Robot->JointComponents)
     {
         FString JointName = JointElement.Value->GetName();
-        float JointPosition = PublisherComponent->Robot->GetJointPosition(JointElement.Key);
-        float JointVelocity = PublisherComponent->Robot->GetJointVelocity(JointElement.Key);
+        float JointPosition = JointElement.Value->GetJointAngle();
+        float JointVelocity = JointElement.Value->GetJointVelocity();
 
         ListJointName.Add(JointName);
         ListJointPosition.Add(JointPosition);
@@ -61,10 +61,9 @@ void URJointStatePublisher::Publish()
     JointState->SetPosition(ListJointPosition);
     JointState->SetVelocity(ListJointVelocity);
 
-    PublisherComponent->Handler->PublishMsg(RobotJointStateTopic, JointState);
+    PublisherComponent->Handler->PublishMsg(Topic, JointState);
 
     UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
-    //                  }
 }
 
 URStringPublisher::URStringPublisher():Super()
@@ -96,7 +95,7 @@ void URStringPublisher::Publish()
     // PublisherComponent->Handler->Process();
 }
 
-URPublisher* URPublisherFactory::CreatePublisher(URPublisherComponent* Owner, FString Topic)
+URPublisher* URPublisherFactory::CreatePublisher(URPublisherSubscriberComponent* Owner, FString Topic)
 {
     URPublisher* Publisher = nullptr;
     if(Topic.Equals("JointState"))
