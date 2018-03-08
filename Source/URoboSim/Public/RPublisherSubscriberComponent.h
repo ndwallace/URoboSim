@@ -7,6 +7,7 @@
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
 #include "RPublisher.h"
+#include "RSubscriber.h"
 #include "RPublisherSubscriberComponent.generated.h"
 
 class ARRobot;
@@ -25,12 +26,16 @@ public:
     virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
     virtual void CreateAllPublishers();
+    virtual void CreateAllSubscriber();
 
     UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
         FString RobotName;
 
     UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-        TMap<FString,bool> RosTopics;
+        TMap<FString,bool> RosPublisherTopics;
+
+    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
+        TMap<FString,bool> RosSubscriberTopics;
 
     UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
         FString WebsocketIPAddr;
@@ -42,7 +47,7 @@ public:
     uint32 TickCount;
 
     // Pointer to robot
-    ARRobot* Robot;
+    ARRobot* Owner;
 
     // ROS Handler
     TSharedPtr<FROSBridgeHandler> Handler;
@@ -51,7 +56,13 @@ public:
         URPublisherFactory* PublisherFactory;
 
     UPROPERTY()
+        URSubscriberFactory* SubscriberFactory;
+
+    UPROPERTY()
         TArray<URPublisher* >PublisherList;
+
+    UPROPERTY()
+        TArray<URSubscriber* >SubscriberList;
 
 protected:
     // Called when the game starts

@@ -14,9 +14,11 @@ URPublisherSubscriberComponent::URPublisherSubscriberComponent()
     WebsocketPort = 9090;
     RobotName = TEXT("pr2_base");
     TickCount = 0;
-    RosTopics.Add("JointState",false);
-    RosTopics.Add("String", true);
+    RosPublisherTopics.Add("JointState",false);
+    RosPublisherTopics.Add("unreal_to_ros_string", true);
+    RosSubscriberTopics.Add("ros_to_unreal_string", true);
     PublisherFactory = CreateDefaultSubobject<URPublisherFactory>(FName(TEXT("PublisherFactory")));
+    SubscriberFactory = CreateDefaultSubobject<URSubscriberFactory>(FName(TEXT("SubscriberFactory")));
 }
 
 
@@ -24,15 +26,33 @@ URPublisherSubscriberComponent::URPublisherSubscriberComponent()
 void URPublisherSubscriberComponent::BeginPlay()
 {
     Super::BeginPlay();
-    Robot = Cast<ARRobot>(GetOwner());
+    Owner = Cast<ARRobot>(GetOwner());
     Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
     Handler->Connect();
     CreateAllPublishers();
+    CreateAllSubscriber();
+}
+
+
+void URPublisherSubscriberComponent::CreateAllSubscriber()
+{
+    for(auto& Topic : RosSubscriberTopics)
+    {
+        if(Topic.Value)
+        {
+            URSubscriber* TempSubscriber = SubscriberFactory->CreateSubscriber(this, Topic.Key);
+            if(TempSubscriber)
+            {
+                TempSubscriber->Init( Topic.Key);
+                SubscriberList.Add(TempSubscriber);
+            }
+        }
+    }
 }
 
 void URPublisherSubscriberComponent::CreateAllPublishers()
 {
-    for(auto& Topic : RosTopics)
+    for(auto& Topic : RosPublisherTopics)
     {
         if(Topic.Value)
         {
