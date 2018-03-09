@@ -14,9 +14,9 @@ URPublisherSubscriberComponent::URPublisherSubscriberComponent()
     WebsocketPort = 9090;
     RobotName = TEXT("pr2_base");
     TickCount = 0;
-    RosPublisherTopics.Add("JointState",false);
-    RosPublisherTopics.Add("unreal_to_ros_string", true);
-    RosSubscriberTopics.Add("ros_to_unreal_string", true);
+    RosPublisherTopics.Add("JointState",true);
+    RosPublisherTopics.Add("unreal_to_ros_string", false);
+    RosSubscriberTopics.Add("ros_to_unreal_string", false);
     PublisherFactory = CreateDefaultSubobject<URPublisherFactory>(FName(TEXT("PublisherFactory")));
     SubscriberFactory = CreateDefaultSubobject<URSubscriberFactory>(FName(TEXT("SubscriberFactory")));
 }

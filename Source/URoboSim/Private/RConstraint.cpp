@@ -18,7 +18,6 @@ void URConstraint::BeginPlay()
 
 URStaticMeshComponent* URConstraint::Child()
 {
-
     return Owner->LinkComponents[ChildName];
 }
 
@@ -150,18 +149,21 @@ void URPrismaticConstraint::Init(URMeshHandler* MeshH)
 
     if (MeshHandler->Joint->Axis.X == 1)
     {
+        RefAxis = FVector(1.0, 0.0, 0.0);
         ConstraintInstance.SetLinearXLimit(LinearConstraintMotion, SimpleLimit);
         ConstraintInstance.ProfileInstance.LinearDrive.XDrive.MaxForce = MeshHandler->Joint->Effort;
     }
 
     else if (MeshHandler->Joint->Axis.Y == 1)
     {
+        RefAxis = FVector(0.0, 1.0, 0.0);
         ConstraintInstance.SetLinearYLimit(LinearConstraintMotion, SimpleLimit);
         ConstraintInstance.ProfileInstance.LinearDrive.YDrive.MaxForce = MeshHandler->Joint->Effort;
     }
 
     else if (MeshHandler->Joint->Axis.Z == 1)
     {
+        RefAxis = FVector(0.0, 0.0, 1.0);
         ConstraintInstance.SetLinearZLimit(LinearConstraintMotion, SimpleLimit);
         ConstraintInstance.ProfileInstance.LinearDrive.ZDrive.MaxForce = MeshHandler->Joint->Effort;
     }
@@ -180,12 +182,25 @@ void URPrismaticConstraint::InitDrive()
 
 float URPrismaticConstraint::GetJointPosition()
 {
-    return 0.;
+    URStaticMeshComponent* ParentComponent = Parent();
+    URStaticMeshComponent* ChildComponent = Child();
+    FVector ParentPosition = ParentComponent->GetComponentLocation();
+    FVector ChildPosition = ChildComponent->GetComponentLocation();
+    float JointPosition = (ParentPosition-ChildPosition).Size();
+    return JointPosition;
 }
 
 float URPrismaticConstraint::GetJointVelocity()
 {
-    return 0.;
+    URStaticMeshComponent* ParentComponent = Parent();
+    URStaticMeshComponent* ChildComponent = Child();
+    FQuat JointQuat = GetComponentTransform().GetRotation();
+    FVector GlobalAxis = JointQuat.RotateVector(RefAxis); // Rotation Axis in Global Frame
+
+    FVector ParentAvel = ParentComponent->GetPhysicsLinearVelocity();
+    FVector ChildAvel = ChildComponent->GetPhysicsLinearVelocity();
+    float JointVelocity = FVector::DotProduct(ParentAvel-ChildAvel, RefAxis);
+    return JointVelocity;
 }
 
 void URRevoluteConstraint::Init(URMeshHandler* MeshH)
@@ -200,6 +215,7 @@ void URRevoluteConstraint::Init(URMeshHandler* MeshH)
     if (MeshHandler->Joint->Axis.X == 1)
     {
         // Angular motor on X axis needs SLERP drive mode
+        RefAxis = FVector(1.0, 0.0, 0.0);
         ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, 0.1f);
         ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, 0.1f);
         ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, SimpleLimit);
@@ -209,12 +225,14 @@ void URRevoluteConstraint::Init(URMeshHandler* MeshH)
 
     else if (MeshHandler->Joint->Axis.Y == 1)
     {
+        RefAxis = FVector(0.0, 1.0, 0.0);
         ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, SimpleLimit);
         ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode = EAngularDriveMode::TwistAndSwing;
         ConstraintInstance.ProfileInstance.AngularDrive.SwingDrive.MaxForce = MeshHandler->Joint->Effort;
     }
     else if (MeshHandler->Joint->Axis.Z == 1)
     {
+        RefAxis = FVector(0.0, 0.0, 1.0);
         ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, SimpleLimit);
         ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode = EAngularDriveMode::TwistAndSwing;
         ConstraintInstance.ProfileInstance.AngularDrive.SwingDrive.MaxForce = MeshHandler->Joint->Effort;
@@ -237,115 +255,38 @@ void URRevoluteConstraint::InitDrive()
 
 float URRevoluteConstraint::GetJointPosition()
 {
-    FString ParentCompName = ComponentName1.ComponentName.ToString();
-    FString ChildCompName = ComponentName2.ComponentName.ToString();
-    URStaticMeshComponent* ParentComponent = Owner->LinkComponents[ParentCompName];
-    URStaticMeshComponent* ChildComponent = Owner->LinkComponents[ChildCompName];
-    if (ParentComponent && ChildComponent)
-    {
-        FRotator ParentRotation = ParentComponent->GetComponentRotation();
-        FRotator ChildRotation = ChildComponent->GetComponentRotation();
-        FQuat CurrentRotationRel = FQuat(ParentRotation).Inverse() * FQuat(ChildRotation);
-        FQuat InitialRotationRel = Owner->OriginRotations[GetName()];
-        FQuat QRel = CurrentRotationRel * InitialRotationRel.Inverse();
-        FVector Axis; float Angle;
-        QRel.ToAxisAndAngle(Axis, Angle);
+    URStaticMeshComponent* ParentComponent = Parent();
+    URStaticMeshComponent* ChildComponent = Child();
+    FRotator ParentRotation = ParentComponent->GetComponentRotation();
+    FRotator ChildRotation = ChildComponent->GetComponentRotation();
+    FQuat CurrentRotationRel = FQuat(ParentRotation).Inverse() * FQuat(ChildRotation);
+    FQuat InitialRotationRel = Owner->OriginRotations[GetName()];
+    FQuat QRel = CurrentRotationRel * InitialRotationRel.Inverse();
+    FVector Axis; float Angle;
+    QRel.ToAxisAndAngle(Axis, Angle);
 
-        // Get Axis
-        auto MotionSwing1 = ConstraintInstance.GetAngularSwing1Motion();
-        auto MotionSwing2 = ConstraintInstance.GetAngularSwing2Motion();
-        auto MotionTwist = ConstraintInstance.GetAngularTwistMotion();
-        bool rotationX = false, rotationY = false, rotationZ = false;
-        if (MotionSwing1 == EAngularConstraintMotion::ACM_Free || MotionSwing1 == EAngularConstraintMotion::ACM_Limited)
-            rotationZ = true;
-        if (MotionSwing2 == EAngularConstraintMotion::ACM_Free || MotionSwing2 == EAngularConstraintMotion::ACM_Limited)
-            rotationY = true;
-        if (MotionTwist == EAngularConstraintMotion::ACM_Free || MotionTwist == EAngularConstraintMotion::ACM_Limited)
-            rotationX = true;
-
-        if ((!rotationX && !rotationY && !rotationZ) || (rotationX && rotationY) || (rotationX && rotationZ) || (rotationY && rotationZ))
-        {
-            // not a hinged joint
-            // UE_LOG(LogTemp, Error, TEXT("Joint [%s] is not a hinged joint with DOF=1"), *Joint->GetName());
-            return 0;
-        }
-        else
-        {
-            // a hinged joint
-            FVector RefAxis;
-            if (rotationX) RefAxis = FVector(1, 0, 0);
-            if (rotationY) RefAxis = FVector(0, 1, 0);
-            if (rotationZ) RefAxis = FVector(0, 0, 1);
-
-            float ResultAngle = FVector::DotProduct(Axis.GetSafeNormal(), RefAxis) * FMath::RadiansToDegrees(Angle);
-            while (ResultAngle > 180)
-                ResultAngle -= 360;
-            while (ResultAngle < -180 )
-                ResultAngle += 360;
-            return ResultAngle;
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Joint [%s] doesn't have parent or child."), *GetName());
-        return 0.0;
-    }
+    // Get Axis
+    float ResultAngle = FVector::DotProduct(Axis.GetSafeNormal(), RefAxis) * FMath::RadiansToDegrees(Angle);
+    while (ResultAngle > 180)
+        ResultAngle -= 360;
+    while (ResultAngle < -180 )
+        ResultAngle += 360;
+    return ResultAngle;
 }
 
 float URRevoluteConstraint::GetJointVelocity()
 {
-    FString ParentCompName = ComponentName1.ComponentName.ToString();
-    FString ChildCompName =  ComponentName2.ComponentName.ToString();
-    URStaticMeshComponent* ParentComponent = Owner->LinkComponents[ParentCompName];
-    URStaticMeshComponent* ChildComponent = Owner->LinkComponents[ChildCompName];
+    URStaticMeshComponent* ParentComponent = Parent();
+    URStaticMeshComponent* ChildComponent = Child();
 
-    if (ParentComponent && ChildComponent)
-    {
-        // Get Rotation Axis
-        auto MotionSwing1 = ConstraintInstance.GetAngularSwing1Motion();
-        auto MotionSwing2 = ConstraintInstance.GetAngularSwing2Motion();
-        auto MotionTwist = ConstraintInstance.GetAngularTwistMotion();
-        bool rotationX = false, rotationY = false, rotationZ = false;
-        if (MotionSwing1 == EAngularConstraintMotion::ACM_Free || MotionSwing1 == EAngularConstraintMotion::ACM_Limited)
-            rotationZ = true;
-        if (MotionSwing2 == EAngularConstraintMotion::ACM_Free || MotionSwing2 == EAngularConstraintMotion::ACM_Limited)
-            rotationY = true;
-        if (MotionTwist == EAngularConstraintMotion::ACM_Free || MotionTwist == EAngularConstraintMotion::ACM_Limited)
-            rotationX = true;
+    FQuat JointQuat = GetComponentTransform().GetRotation();
+    FVector GlobalAxis = JointQuat.RotateVector(RefAxis); // Rotation Axis in Global Frame
 
-        if ((!rotationX && !rotationY && !rotationZ) || (rotationX && rotationY) || (rotationX && rotationZ) || (rotationY && rotationZ))
-        {
-            // not a hinged joint
-            UE_LOG(LogTemp, Error, TEXT("Joint [%s] is not a hinged joint with DOF=1"), *GetName());
-            return 0.0;
-        }
-        else
-        {
-            // a hinged joint
-            FVector RefAxis;
-            if (rotationX) RefAxis = FVector(1, 0, 0);
-            if (rotationY) RefAxis = FVector(0, 1, 0);
-            if (rotationZ) RefAxis = FVector(0, 0, 1);
+    FVector ParentAvel = ParentComponent->GetPhysicsAngularVelocityInRadians();
+    FVector ChildAvel = ChildComponent->GetPhysicsAngularVelocityInRadians();
+    float HingeVel = FVector::DotProduct(ChildAvel - ParentAvel, GlobalAxis);
 
-            // Get Axis ?
-            FQuat JointQuat = GetComponentTransform().GetRotation();
-            FVector GlobalAxis = JointQuat.RotateVector(RefAxis); // Rotation Axis in Global Frame
-
-            FVector ParentAvel = ParentComponent->GetPhysicsAngularVelocityInRadians();
-            FVector ChildAvel = ChildComponent->GetPhysicsAngularVelocityInRadians();
-            float HingeVel = FVector::DotProduct(ChildAvel - ParentAvel, GlobalAxis);
-
-            /* UE_LOG(LogTemp, Warning, TEXT("Joint [%s]: HingeVel = %.3f; ChildAvel [%s], ParentAvel [%s], Axis [%s] (global)"),
-             *Joint->GetName(), HingeVel, *ChildAvel.ToString(), *ParentAvel.ToString(), *GlobalAxis.ToString()); */
-
-            return HingeVel;
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Joint [%s] doesn't have parent or child."), *GetName());
-        return 0.0;
-    }
+    return HingeVel;
 }
 
 void URPlanarConstraint::Init(URMeshHandler* MeshH)
@@ -395,14 +336,17 @@ void URContinuousConstraint::Init(URMeshHandler* MeshH)
 
     if (MeshHandler->Joint->Axis.Z == 1)
     {
+        RefAxis = FVector(1.0, 0.0, 0.0);
         ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 0);
     }
     else if (MeshHandler->Joint->Axis.X == 1)
     {
+        RefAxis = FVector(0.0, 1.0, 0.0);
         ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
     }
     else if (MeshHandler->Joint->Axis.Y == 1)
     {
+        RefAxis = FVector(0.0, 0.0, 1.0);
         ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 0);
     }
 }

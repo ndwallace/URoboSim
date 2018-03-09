@@ -50,6 +50,9 @@ public:
 
     UPROPERTY()
     ARRobot* Owner;
+
+    UPROPERTY()
+    FVector RefAxis;
 };
 
 UCLASS()

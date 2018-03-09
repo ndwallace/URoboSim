@@ -63,7 +63,7 @@ void URJointStatePublisher::Publish()
 
     PublisherComponent->Handler->PublishMsg(Topic, JointState);
 
-    UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
+    // UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
 }
 
 URStringPublisher::URStringPublisher():Super()

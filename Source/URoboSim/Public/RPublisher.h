@@ -8,6 +8,8 @@
 #include "ROSBridgePublisher.h"
 #include "RPublisher.generated.h"
 
+//TODO dont publish jointstate of virtual messages
+
 class  ARRobot;
 class URPublisherSubscriberComponent;
 
