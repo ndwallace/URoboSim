@@ -93,6 +93,9 @@ public:
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
     void InitDrive();
+
+    virtual float GetJointPosition();
+    virtual float GetJointVelocity();
 };
 
 UCLASS()
@@ -105,6 +108,9 @@ public:
     void Init(URMeshHandler* MeshH);
     // Configures the Unreal Engine native joint drive
     void InitDrive();
+
+    virtual float GetJointPosition();
+    virtual float GetJointVelocity();
 };
 
 UCLASS()
