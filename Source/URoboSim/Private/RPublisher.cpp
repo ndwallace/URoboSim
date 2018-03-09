@@ -46,7 +46,7 @@ void URJointStatePublisher::Publish()
     for (auto &JointElement : PublisherComponent->Owner->JointComponents)
     {
         FString JointName = JointElement.Value->GetName();
-        float JointPosition = JointElement.Value->GetJointAngle();
+        float JointPosition = JointElement.Value->GetJointPosition();
         float JointVelocity = JointElement.Value->GetJointVelocity();
 
         ListJointName.Add(JointName);

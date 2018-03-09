@@ -4,12 +4,10 @@
 
 URConstraint::URConstraint()
 {
-
 }
 
 void URConstraint::Init(URMeshHandler* MeshH)
 {
-    // Owner = MeshH->Owner;
 }
 
 void URConstraint::BeginPlay()
@@ -18,7 +16,28 @@ void URConstraint::BeginPlay()
     Owner = Cast<ARRobot>(ConstraintActor1);
 }
 
-float URConstraint::GetJointAngle()
+URStaticMeshComponent* URConstraint::Child()
+{
+
+    return Owner->LinkComponents[ChildName];
+}
+
+URStaticMeshComponent* URConstraint::Parent()
+{
+    return Owner->LinkComponents[ParentName];
+}
+
+float URConstraint::GetJointPosition()
+{
+    return 0.;
+}
+
+float URConstraint::GetJointVelocity()
+{
+    return 0.;
+}
+
+float URFixedConstraint::GetJointPosition()
 {
     // UPhysicsConstraintComponent* Joint = JointComponents[JointName];
     FString ParentCompName = ComponentName1.ComponentName.ToString();
@@ -76,7 +95,7 @@ float URConstraint::GetJointAngle()
     }
 }
 
-float URConstraint::GetJointVelocity()
+float URFixedConstraint::GetJointVelocity()
 {
     FString ParentCompName = ComponentName1.ComponentName.ToString();
     FString ChildCompName =  ComponentName2.ComponentName.ToString();
@@ -172,6 +191,9 @@ void URFixedConstraint::Init(URMeshHandler* MeshH)
     ConstraintInstance.AngularRotationOffset = FRotator(0, 0, 0);
     ConstraintInstance.ProfileInstance.TwistLimit.bSoftConstraint = false;
     ConstraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = false;
+
+    ChildName = MeshHandler->Link->Name;
+    ParentName = MeshHandler->ParentComp->GetName();
 }
 
 float URFixedConstraint::CreateContraintLimit()
@@ -200,7 +222,6 @@ void URFixedConstraint::SetupConstraint()
 
     SetWorldLocation(MeshHandler->MeshComp->GetComponentLocation());
     SetConstrainedComponents(MeshHandler->ParentComp, NAME_None, MeshHandler->MeshComp, NAME_None);
-    ChildName = MeshHandler->Link->Name;
 
     FRotator ParentRotation = MeshHandler->ParentComp->GetComponentRotation();
     FRotator ChildRotation =  MeshHandler->MeshComp->GetComponentRotation();

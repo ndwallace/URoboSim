@@ -8,6 +8,7 @@
 #include "Runtime/Engine/Classes/Components/SceneComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/NoExportTypes.h"
 #include "Structs.h"
+#include "RStaticMeshComponent.h"
 #include "RConstraint.generated.h"
 
 class ARRobot;
@@ -32,14 +33,20 @@ public:
     virtual void SetupConstraint(){};
     bool bEnableMotor = false;
 
-    virtual float GetJointAngle();
+    virtual float GetJointPosition();
     virtual float GetJointVelocity();
+
+    virtual URStaticMeshComponent* Child();
+    virtual URStaticMeshComponent* Parent();
 
     UPROPERTY()
     FString Type;
 
     UPROPERTY()
     FString ChildName;
+
+    UPROPERTY()
+    FString ParentName;
 
     UPROPERTY()
     ARRobot* Owner;
@@ -59,6 +66,9 @@ public:
     // Connects joint and links
     void SetupConstraint();
     float CreateContraintLimit();
+
+    virtual float GetJointPosition();
+    virtual float GetJointVelocity();
 };
 
 UCLASS()
