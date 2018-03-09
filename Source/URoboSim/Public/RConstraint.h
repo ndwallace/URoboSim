@@ -126,7 +126,7 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URContinuousConstraint : public URFixedConstraint
+class UROBOSIM_API URContinuousConstraint : public URRevoluteConstraint
 {
     GENERATED_BODY()
 public:
