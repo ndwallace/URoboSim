@@ -146,6 +146,7 @@ bool ARRobot::CreateActorsFromNode(FRNode* Node)
                 URConstraint* Constraint = CreateConstraint(MeshHandler);
                 //	  URConstraint* Constraint = ConstraintFactory.MakeConstraint(ParentComp, Joint, Link);
                 Constraint->InitDrive();
+
                 Constraint->SetupConstraint();
                 MeshHandler->AddConnectedJoint();
 

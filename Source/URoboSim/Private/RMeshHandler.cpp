@@ -56,12 +56,7 @@ bool URMeshHandler::CreateLink()
     Joint->LowerLimit = FMath::RadiansToDegrees(Joint->LowerLimit);
     Joint->UpperLimit = FMath::RadiansToDegrees(Joint->UpperLimit);
     bUseVisual = !(Link->Visual.Mesh.IsEmpty());
-    bUseCollision = !(Link->Collision.Mesh.IsEmpty());
-    //
-    //
-    // why bUseCollision hard coded????   Maybe because collision in pr2
-    //
-
+    // bUseCollision = !(Link->Collision.Mesh.IsEmpty());
 
     bUseCollision = bEnableCollisionTags;
 
