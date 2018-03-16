@@ -85,6 +85,7 @@ struct UROBOSIM_API FRJoint
 
 // A structure representing a URDF Link
 
+
 struct UROBOSIM_API FRLink
 {
 
@@ -130,7 +131,6 @@ struct UROBOSIM_API FRLink
 	return Name.Equals(String);
   }
 };
-
 // Node to represent the Robot virtually as a tree
 struct UROBOSIM_API FRNode
 {
