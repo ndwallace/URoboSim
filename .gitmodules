@@ -1,0 +1,12 @@
+[submodule "Plugins/UCoordConv"]
+	path = Plugins/UCoordConv
+	url = git@github.com:robcog-iai/UCoordConv.git
+[submodule "Plugins/UTags"]
+	path = Plugins/UTags
+	url = git@github.com:robcog-iai/UTags.git
+[submodule "Plugins/UROSBridge"]
+	path = Plugins/UROSBridge
+	url = git@github.com:robcog-iai/UROSBridge.git
+[submodule "Plugins/UTFPublisher"]
+	path = Plugins/UTFPublisher
+	url = git@github.com:robcog-iai/UTFPublisher.git
