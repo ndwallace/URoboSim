@@ -52,7 +52,8 @@ void URStaticMeshComponent::BeginPlay()
         SecondaryComponentTick.RegisterTickFunction(Owner->GetLevel());
     }
 
-    PRigidBody = GetBodyInstance()->GetPxRigidBody_AssumesLocked();
+    //todo- this breaks compilation. Removing for now.
+//    PRigidBody = GetBodyInstance()->GetPxRigidBody_AssumesLocked();
 
     // StartH = GetComponentLocation().Z;
     // StartPos = GetComponentLocation();
