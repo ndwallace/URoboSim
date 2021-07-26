@@ -188,11 +188,15 @@ FString URFactoryRURDFData::AdeptXml(const FString PathToXml,
 		if (Line.Contains("mesh filename") && (Line.Contains("fbx") || Line.Contains("stl") || Line.Contains("dae"))&& !bInComment) {
 
 			// Standardizes the file paths for the Xml
-			Line = Line.Replace((L"\\"), (L"/"), ESearchCase::IgnoreCase);
-			Line = Line.Replace((L"package://"), (L"/"), ESearchCase::IgnoreCase);
-			Line = Line.Replace((L".stl"), (L".fbx"), ESearchCase::IgnoreCase);
-			Line = Line.Replace((L".dae"), (L".fbx"), ESearchCase::IgnoreCase);
-			FString SaveLine = Line;
+//			Line = Line.Replace((L"\\"), (L"/"), ESearchCase::IgnoreCase);
+//			Line = Line.Replace((L"package://"), (L"/"), ESearchCase::IgnoreCase);
+//			Line = Line.Replace((L".stl"), (L".fbx"), ESearchCase::IgnoreCase);
+//			Line = Line.Replace((L".dae"), (L".fbx"), ESearchCase::IgnoreCase);
+            Line = Line.Replace(TEXT("\\"), TEXT("/"), ESearchCase::IgnoreCase);
+            Line = Line.Replace(TEXT("package://"), TEXT("/"), ESearchCase::IgnoreCase);
+            Line = Line.Replace(TEXT(".stl"), TEXT(".fbx"), ESearchCase::IgnoreCase);
+            Line = Line.Replace(TEXT(".dae"), TEXT(".fbx"), ESearchCase::IgnoreCase);
+            FString SaveLine = Line;
 
 			// Delete everything before the path.
 			Line.RemoveAt(0, Line.Find("\"") + 1, true);
@@ -201,7 +205,8 @@ FString URFactoryRURDFData::AdeptXml(const FString PathToXml,
 
 			// Deletes information to get the path. 
 			Line.RemoveAt(0, Line.Find("\""), true);
-			PathToFbx = PathToFbx.Replace(*Line, (L""), ESearchCase::IgnoreCase);
+//			PathToFbx = PathToFbx.Replace(*Line, (L""), ESearchCase::IgnoreCase);
+            PathToFbx = PathToFbx.Replace(*Line, TEXT(""), ESearchCase::IgnoreCase);
 
 			// FString that stores the mesh name. Only fbx files are allowed.
 			FString FbxName = FPaths::GetBaseFilename(PathToFbx, true);
@@ -262,10 +267,13 @@ FString URFactoryRURDFData::AdeptXml(const FString PathToXml,
 					// The FBXImporter works with this .fbx path.
 					Factory->CurrentFilename = Elem.Value;
 
-					UObject* Mesh = Factory->FactoryCreateBinary(UStaticMesh::StaticClass(),
-						PackageForMeshes, FName(*Elem.Key), Flags | RF_Transactional,
-						nullptr, TEXT("fbx"), NewBuffer, nullptr,
-						GWarn, bAndOutOperationCancelled);
+//					UObject* Mesh = Factory->FactoryCreateBinary(UStaticMesh::StaticClass(),
+//						PackageForMeshes, FName(*Elem.Key), Flags | RF_Transactional,
+//						nullptr, TEXT("fbx"), NewBuffer, nullptr,
+//						GWarn, bAndOutOperationCancelled);
+                    UObject* Mesh = Factory->FactoryCreateFile(UStaticMesh::StaticClass(),
+                         PackageForMeshes, FName(*Elem.Key), Flags | RF_Transactional, FString(*Elem.Value),
+                         nullptr, GWarn, bAndOutOperationCancelled);
 
 					// If Operation Cancelled
 					if (bAndOutOperationCancelled) {
