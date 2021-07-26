@@ -453,9 +453,12 @@ void  FRURDFParser::ParseURDF(FString XmlUrdf)
     // Remove linebreaks and tabs
     //XmlUrdf = XmlUrdf.Trim().TrimTrailing();
     XmlUrdf.TrimStartAndEndInline();
-    XmlUrdf = XmlUrdf.Replace(L"\n", L" ");
-    XmlUrdf = XmlUrdf.Replace(L"\r", L"");
-    XmlUrdf = XmlUrdf.Replace(L"\t", L" ");
+//    XmlUrdf = XmlUrdf.Replace(L"\n", L" ");
+//    XmlUrdf = XmlUrdf.Replace(L"\r", L"");
+//    XmlUrdf = XmlUrdf.Replace(L"\t", L" ");
+    XmlUrdf = XmlUrdf.Replace(TEXT("\n"), TEXT(" "));
+    XmlUrdf = XmlUrdf.Replace(TEXT("\r"), TEXT(""));
+    XmlUrdf = XmlUrdf.Replace(TEXT("\t"), TEXT(" "));
 
     if (XmlUrdf.IsEmpty()) return;
 
