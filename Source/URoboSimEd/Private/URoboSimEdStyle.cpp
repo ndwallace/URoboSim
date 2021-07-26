@@ -3,10 +3,9 @@
 
 #include "URoboSimEdStyle.h"
 #include "URoboSimEdModule.h"
-#include "SlateGameResources.h"
-#include "IPluginManager.h"
-#include "Styling/SlateTypes.h"
+#include "Slate/SlateGameResources.h"
 #include "Interfaces/IPluginManager.h"
+#include "Styling/SlateTypes.h"
 
 TSharedPtr< FSlateStyleSet > FURoboSimEdStyle::StyleSetInstance = NULL;
 
