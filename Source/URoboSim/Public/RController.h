@@ -94,10 +94,8 @@ public:
 
     virtual void SetupInputBindings(UInputComponent* IC);
 
-    UFUNCTION()
-        virtual void MoveForward(float AxisValue);
-    UFUNCTION()
-        virtual void TurnWheels(float AxisValue);
+    virtual void MoveForward(float AxisValue);
+    virtual void TurnWheels(float AxisValue);
 
 };
 
